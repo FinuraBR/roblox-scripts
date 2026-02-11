@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/FinuraBR/Roblox-scripts-backup/refs/heads/main/dex%20working?token=GHSAT0AAAAAACZWXJKT2HLGLUBGOBKD7M2SZ2MX7RQ"))()

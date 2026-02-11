@@ -1,0 +1,16 @@
+for _, v in pairs(workspace:GetDescendants()) do
+        if v:IsA("TouchTransmitter") then
+            if v.Parent and v.Parent:IsA("Part") then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame
+                task.wait(0.1)
+            end
+        end
+    end
+
+--for _,v in pairs(workspace:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0) --0 is touch
+task.wait()
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1) -- 1 is untouch
+end
+end

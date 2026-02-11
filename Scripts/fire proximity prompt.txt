@@ -1,0 +1,43 @@
+function fireproximityprompt(ProximityPrompt, Amount, Skip)
+    assert(ProximityPrompt, "Argument #1 Missing or nil")
+    assert(typeof(ProximityPrompt) == "Instance" and ProximityPrompt:IsA("ProximityPrompt"), "Attempted to fire a Value that is not a ProximityPrompt")
+
+    local HoldDuration = ProximityPrompt.HoldDuration
+    if Skip then
+        ProximityPrompt.HoldDuration = 0
+    end
+
+    for i = 1, Amount or 1 do
+        ProximityPrompt:InputHoldBegin()
+        if Skip then
+            local RunService = game:GetService("RunService")
+            local Start = time()
+            repeat
+                RunService.Heartbeat:Wait(0.1)
+            until time() - Start > HoldDuration
+        end
+        ProximityPrompt:InputHoldEnd()
+    end
+    ProximityPrompt.HoldDuration = HoldDuration
+end
+
+--só a parte de baixo é mais seguro pois o jogo n detecta
+
+function fire()
+    for _, v in ipairs(game:GetService("Workspace"):GetDescendants()) do
+       if v:IsA("ProximityPrompt") then
+           fireproximityprompt(v)
+       end
+   end
+end
+
+fire()
+
+
+--function CollectCoins()
+for i, v in workspace.House.Coins:GetChildren() do
+ game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Coin.CFrame
+ task.wait(.25)
+ fireproximityprompt(v.Main:FindFirstChild("ProximityPrompt"))
+end
+end
