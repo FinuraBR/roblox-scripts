@@ -1,0 +1,86 @@
+-- https://www.roblox.com/games/18616404175/UPD-Cars-RNG
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "FinuraBR HUB", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+_G.hack = true
+
+function hack()
+	while _G.hack == true do
+		local args = {
+			[1] = 0
+		}
+		
+		game:GetService("ReplicatedStorage").xM8:FindFirstChild("142ae303-0fb7-473b-9081-797f5946010f"):FireServer(unpack(args))
+		wait()
+		local args = {
+			[1] = 0,
+			[2] = true
+		}
+		
+		game:GetService("ReplicatedStorage").xM8:FindFirstChild("c1841059-29c3-4bb0-96a7-9e37f3848330"):FireServer(unpack(args))
+		
+	end
+end
+
+local Tab = Window:MakeTab({
+	Name = "Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Auto Roll",
+	Default = false,
+	Callback = function(Value)
+		_G.hack = Value
+		hack()
+	end    
+})
+OrionLib:Init()
+
+
+--local
+ orion = loadstring(game:HttpGet"https://raw.githubusercontent.com/shlexware/Orion/main/source")()
+local
+ window = orion:MakeWindow{
+    Name = "Pet Market (by FinuraBR)",
+    HidePremium = false,
+    SaveConfig = true,
+    ConfigFolder = "OrionTest"
+}
+
+local
+ click_pet = game:GetService"ReplicatedStorage".Events.ClickPet;
+local
+ click = false;
+
+local
+ function auto_click()
+    while click and task.wait(0.05) do
+        click_pet:FireServer()
+    end
+end
+
+local
+ tab = window:MakeTab{
+    Name = "Game",
+    Icon = "rbxassetid://4483345998",
+    PremiumOnly = false
+}
+
+tab:AddToggle{
+    Name = "Auto Click",
+    Default = false,
+    Callback = function(
+value
+)
+        click = value
+
+        if value then
+            task.defer(auto_click)
+        end
+    end
+}
+
+orion:Init()

@@ -1,0 +1,34 @@
+-- https://www.roblox.com/games/18853192637/Pet-Mine-NEW
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Pet Mine! (by FinuraBR)", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+getgenv().autocoletar = true
+
+function autocoletar()
+	while getgenv().autocoletar == true do
+			for _,v in pairs(workspace.Drops:GetDescendants()) do
+			if v:IsA("Part") then
+			v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			end
+			end
+		wait()
+	end
+end
+
+local Tab = Window:MakeTab({
+	Name = "Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Auto Coletar",
+	Default = false,
+	Callback = function(Value)
+		getgenv().autocoletar = Value
+		autocoletar()
+	end    
+})
+
+OrionLib:Init()

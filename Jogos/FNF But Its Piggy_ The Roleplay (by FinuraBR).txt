@@ -1,0 +1,1199 @@
+-- https://www.roblox.com/games/9349391546/FNF-But-Its-Piggy-The-Roleplay
+
+--// Load Rayfield Library
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+--// Window
+local Window = Rayfield:CreateWindow({
+    Name = "Universal GUI (by FinuraBR)",
+    LoadingTitle = "Universal GUI Script",
+    LoadingSubtitle = "by FinuraBR",
+    ToggleUIKeybind = "Z",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "RayfieldConfigs",
+        FileName = "Universal GUI by FinuraBR"
+    },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
+
+--// Serviços
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+--// Variáveis globais
+local lastBaseplatePosition = Vector3.new(0, 2053, 0)
+local brightnessLoop = false
+local infiniteJumpEnabled = false
+local savedWalkSpeed = 16
+local savedJumpPower = 50
+
+-- Variáveis Sprint
+local sprintEnabled = false
+local sprintKey = Enum.KeyCode.LeftShift
+local sprintSpeed = 100
+local holdingSprint = false
+
+local function toKeyCode(k)
+    if typeof(k) == "EnumItem" then
+        return k
+    end
+    if type(k) == "string" then
+        if Enum.KeyCode[k] then
+            return Enum.KeyCode[k]
+        end
+        local up = k:upper()
+        if Enum.KeyCode[up] then
+            return Enum.KeyCode[up]
+        end
+    end
+    return Enum.KeyCode.LeftShift
+end
+
+--// Aba Main
+local TabMain = Window:CreateTab("Main", 4483345998)
+
+
+local morphNames = {
+"GOD",
+"PicoOverdueStanding",
+"PicoOverdueRunning",
+"PicoOverdue",
+"PiceDeathCipherScared",
+"PiceDeathCipher",
+"ForestallWillow",
+"RedPandaPico",
+"TattleTail",
+"TheDog",
+"TheDogRealLife",
+"TheDogRight",
+"TheDogLeft",
+"Mamatail",
+"SmilingDog",
+"NicodemusCartoony",
+"ChibiOnion",
+"NightmareChibiOnion",
+"SurvivorOnion",
+"FrostBiteOnion",
+"FurnaceOnion",
+"ControlLoadedBoyFriend",
+"MillerBoyFriend",
+"FinalEscapeBoyFriend",
+"PigBoyFriend",
+"CartoonBoyFriend",
+"LowPolyBF",
+"GhostBoyFriend",
+"BFRedesign",
+"MinecraftBF",
+"DDLCBFPoems",
+"DDLCBFCrazy",
+"DDLCBFSad",
+"DokiDokiBFRedesign",
+"TrainConductorBF",
+"DSideBfOld",
+"DsidesBF",
+"SwimsuitBF",
+"JacketBF",
+"SurvivorBF",
+"BFSonicLegacyAlts",
+"BFSonicLegacy",
+"MariosMadnessBFAct2",
+"MariosMadnessBFScared",
+"MariosMadnessBFWorried",
+"MariosMadnessBF",
+"MariosMadnessBFGamer",
+"GrandBFCaveman",
+"GrandBF",
+"Pikafriend",
+"GhostBf",
+"MariosMadnessBFThalassophobia",
+"MariosMadnessBFUpgraded",
+"MariosMadnessBFApparition",
+"MariosMadnessBFLastCourse",
+"MariosMadnessBFDayOut",
+"MariosMadnessBFDictator",
+"MariosMadnessBFAct4Angry",
+"MariosMadnessBFAct4Mad",
+"MariosMadnessBFAct4Sad",
+"MariosMadnessBFAct4",
+"MariosMadnessBFRaceTraitors",
+"MariosMadnessBFGoldenLand",
+"MariosMadnessBFPixel",
+"MariosMadnessBFNoParty",
+"MariosMadnessBFDemise",
+"MariosMadnessBFParanoiaScared",
+"MariosMadnessBFParanoia",
+"UnbeatableBFAlts",
+"UnbeatableBF",
+"JerboaBF",
+"BFPigPlaytoy",
+"BFPigMusicalMemory",
+"CyclopsControl",
+"CyclopsManipulator",
+"CyclopsInstagation",
+"CyclopsLoaded",
+"SchoolHouseSonic",
+"TeacherSonicGeorgie",
+"CyclopsTails",
+"CyclopsTailsPenny",
+"CorruptedCyclopsParasee",
+"CyclopsInstagationHead",
+"CyclopsControlParasee",
+"CyclopsmanipulatorParasee",
+"CyclopsInstagationParasee",
+"CyclopsControlLoadedParasee",
+"MarkusExeOld",
+"Markusexe",
+"RashExeSlay",
+"RashExePixel",
+"RashExeOld",
+"Rashexe",
+"XenoAlfisOld",
+"XenoAlfis",
+"TailsPennyOld",
+"TailsPenny",
+"KnucklesBillyOld",
+"KnucklesBilly",
+"EggManArchieOld",
+"EggManArchie",
+"MajinDessaSlayBells",
+"MajinDessaOld2",
+"MajinDessaOld",
+"MajinDessa",
+"LordxDakodaSlayBells",
+"LordxDakodaOld",
+"LordxDakoda",
+"FleetwayBakariOld",
+"FleetwayBakari",
+"TailsDollPhennaOld",
+"TailsDollPhenna",
+"SoullessPhenaOld",
+"SoullessPhenna",
+"HollowBadgy",
+"TooFarLuara",
+"TooFarTeddy",
+"ForestallDesireDonut",
+"PerditionSqueldria",
+"ManiaPony",
+"BurningRash",
+"BurningArchie",
+"FurnaceRobbyOld",
+"FurnaceRobby",
+"PreyMarkus",
+"StarvedMrP",
+"StarvedKonaOld",
+"KonaStarved",
+"StarvedKona",
+"PreyGeorgie",
+"SurvivorPenny",
+"NeedleMari",
+"NeedlemariOld",
+"NeedlemariNoTIO",
+"LutherFelix",
+"TrueFatalErrorOldest",
+"TrueFatalErrorOld",
+"TrueFatalError",
+"FatalErrorOldest",
+"FatalErrorOld",
+"FatalError",
+"HogPennyOld",
+"HogPenny",
+"ScorcherMr",
+"ScorcherOld",
+"RealFakerPennyOld",
+"RealFakerPenny",
+"FakerStitchyJingleHells",
+"FakerStitchyOld2",
+"FakerStitchyOld",
+"FakerStitchy",
+"WechidnaBilly",
+"TrueWechidnaBilly",
+"TrueChaotixBilly",
+"ChaotixBilly",
+"MightyTobi",
+"TrueMightyTobi",
+"SonichuRash",
+"XTerionOLD",
+"XTerion",
+"PennySunkyOld",
+"AlfisFinalEscapeXenophanesOld",
+"AlfisFinalEscapeXenophanes",
+"CurseTigryOLD",
+"CurseTigry",
+"Black Imposter (Double Kill)",
+"Black Imposter Danger (Mad)",
+"Black Imposter (Danger)",
+"Black Imposter",
+"Red Impostor",
+"Red Impostor (Scared)",
+"Green",
+"GreenImpostor",
+"GreenImpostorParasite",
+"Yellow",
+"White Impostor",
+"White Impostor (Double Kill)",
+"Black Impostor Parasite",
+"Maroon",
+"Maroon Parasite",
+"Gray Impostor",
+"Pink",
+"Pink (Impostor)",
+"Monotone",
+"Tomongus",
+"Tomongus (Exposed)",
+"Jorjawsee",
+"Red Mungus",
+"Red Mungus (Voting Time)",
+"Red Mungus Parasite",
+"Warchief",
+"Jelqer",
+"Chefogus",
+"Powers",
+"JADS",
+"Deadpostor",
+"CorruptedSonicDoggy",
+"CorruptedSonicnew",
+"CorruptedTwilightMimi",
+"CorruptedPeppaPenny",
+"CorruptedPepanew",
+"GodFeastMajinDessaDSide",
+"MajinDessaDSide",
+"GodFeastCrazyRashZIP",
+"CrazyRashZIP",
+"RashZIP",
+"SunkyPennyDsides",
+"SunkyMightyDsidesPhase2",
+"SunkyMightyDsides",
+"EggManDSides",
+"GodFeastRashexe",
+"GodFeastLordX",
+"GodFeastMajinDessa",
+"MonarchDDakoda",
+"NatsukiDsides",
+"VirtualROM",
+"VirtualROMTrueFormPhase",
+"VirtualROMTrueForm",
+"KinoBunnySitting",
+"KinoBunnyAngry",
+"KinoBunnyNormal",
+"KineZompiggyEnding",
+"KineZompiggyAngry",
+"KineZompiggyCalmed",
+"KineZompiggy",
+"KineBunnyHalkInfected",
+"KineBunnyInfected",
+"ClassicBunny",
+"ControlledClassicZompiggy",
+"ClassicZompiggy",
+"TrollanHorse",
+"TheSpectator",
+"School",
+"OutPost",
+"Marginary",
+"BR0Glitched",
+"BR0",
+"P0RK",
+"BendyMrWood",
+"BendyCutout2",
+"InkDemon",
+"BendyNightmareRunMrStitchy",
+"BendyMrStitchy",
+"InkDemonNightmareRun",
+"SansBonesZee",
+"SansZee",
+"PapirusZuzy",
+"NightmareCupheadGeorgie",
+"NightmareCuphead",
+"NightmareSansZee",
+"NightmareBendyTIO",
+"TheDevilDevilPiggy",
+"CupheadGeorgieAngry",
+"Cuphead",
+"GirlFriend",
+"NewGFPig",
+"HypnoGFLostCauseBF",
+"HypnoGFLostCause",
+"HypnoGFBringstone",
+"HypnoGF",
+"ArtistGirlFriendOld",
+"ArtistGirlFriend",
+"GFAllStars",
+"GX",
+"VirtualGF",
+"SansnoGF",
+"SheepGF",
+"JohnDick",
+"HorrorMarioStarman",
+"HorrorMarioAngry",
+"HorrorDoggyDoggyOLD",
+"HorrorMario",
+"IHYLuigiOLD",
+"IHYLuigi",
+"PixelMarioPhase2",
+"PixelMarioPhase3",
+"PixelMario",
+"Omega",
+"CoronationDayPeachZizzy",
+"CoronationDayPeach",
+"HorrorPeach",
+"YoshiExe",
+"Somari",
+"SoCoolKreekCraft",
+"Grandad",
+"TheForgiven",
+"MeltedHorrorMario",
+"BetaLuigi",
+"SittingBetaLuigi",
+"OLDBetaLuigi",
+"BetaMario",
+"OhGodNoMario",
+"LIsReal",
+"OhGodNoLuigi",
+"Turmoil",
+"ApparitionWarioOLD",
+"ApparitionWario",
+"SuperBadMario",
+"DayOutMario",
+"DayOutLuigi",
+"RacerMarioDoggyOLD",
+"RacerMario",
+"DevilMario",
+"DictatorMario",
+"GBOLD",
+"GB",
+"TrueFormGBOLD",
+"TrueFormGB",
+"DjHallyBoo",
+"FakerFoxy",
+"MrLHallWay",
+"MrL",
+"MrV",
+"SadPromotionmario",
+"Promotionmario",
+"MXDemise",
+"MXOLD",
+"MX",
+"ClassifiedLuigi",
+"ClassifiedLuigiLowPoly",
+"ClassifiedLuigiAlt",
+"Falsehero",
+"Stanley",
+"Costume",
+"CostumeGF",
+"SittingCostume",
+"UltraMAct",
+"UltraM",
+"LG",
+"WAR",
+"YOSH",
+"MrSys",
+"DogHunt",
+"UnbeatableBowser",
+"GrandadCaveman",
+"PixelKiloByte",
+"KiloByte",
+"DeathCipherMario",
+"Speaker",
+"VictimOne",
+"InkBowser",
+"VerdantMarioClassic",
+"VerdantMarioAngry",
+"VerdantMarioSad",
+"VerdantMario",
+"InkBowserClassic",
+"FatalTIOGlitched",
+"FatalTIO",
+"FatalTIOPhaseGlitched",
+"FatalTIOPhase",
+"TrueFatalTIOBFGlitched",
+"TrueFatalTIOBF",
+"TrueFatalTIOGlitched",
+"TrueFatalTIO",
+"FatalRash",
+"FatalBunny",
+"FatalArchie",
+"FatalRaze",
+"FatalGF",
+"FatalGFPhase2",
+"ShadowBonniePennyOld",
+"ShadowBonnieBunny",
+"BearyFreddyFazbear",
+"FreddyBiteNewEyes",
+"FreddyBiteNew",
+"MatPatMiniToon",
+"MillerPortalMaster",
+"WillianPony",
+"PuppetBrella",
+"PeterAITigry",
+"SteveWoshe",
+"ChicaPhenna",
+"FoxyBudgey",
+"SpringtrapDinoPiggy",
+"Springtrap",
+"NightmareBFFNAFWorld",
+"PhotoNegativeRazeFNATIMix",
+"PhotoNegativeRaze",
+"PhotoNegativeRazeHeadless",
+"PhotoNegativeRazeHeadlessPhase2",
+"Face",
+"Oswald",
+"Flumpty",
+"GoldenFlumpty",
+"BirthdayBlam",
+"CrustyClowny",
+"UndyingRaze",
+"PremiumMafiaSpongeBob",
+"PremiumFakerStitchy",
+"PremiumMissingno",
+"PremiumPhotoNegativeRazeHeadless",
+"PremiumHypnoArchie",
+"PremiumCienKPig",
+"TennisPlayerPig",
+"Aaron",
+"Protectron",
+"NightmareGF",
+"NightmareBF",
+"TheMachine",
+"Toxic",
+"QuinientosKPig",
+"CienKPig",
+"Walton",
+"CamiloOLD",
+"Camilo",
+"Scholandra",
+"FakerWillow",
+"BlacksunWillow",
+"Lenny",
+"ChibiSpidella",
+"Martin",
+"NormalCartoonCat",
+"CartoonCatMonster",
+"CartoonCat",
+"MXKolieNormal",
+"MXKolieBAD",
+"MXKolieMad",
+"GeorgieGameOver",
+"FergusSlasher",
+"CheddarMateo",
+"MeltRash",
+"Jerry",
+"MafiaSpongeBob",
+"MafiaSpongeBobNewNoTable",
+"MafiaSpongeBobNew",
+"GodZVectormanOLD",
+"GozVectorman",
+"GodZRistarOLD",
+"GodZRistar",
+"GodZAlexKiddOLD",
+"GodZAlexKidd",
+"GodZOLD",
+"GodZ",
+"Mario64",
+"BF64",
+"Famished",
+"Spike",
+"Ellie",
+"Charles",
+"RightHandMan",
+"Henry",
+"Reginald",
+"SuperDedHyArchieOld",
+"SuperDedHyArchie",
+"DedHyAriche",
+"LullabyArchieLU",
+"HyArchie",
+"PastaArchie",
+"LullabyArchiePN",
+"LullabyArchie",
+"LilArchie",
+"LilBudgey",
+"FrostBobby",
+"SilverTigryOLD",
+"SilverTigry",
+"Silver",
+"FrostGhosty",
+"DedFrostbobby",
+"DedLostGhostyOld",
+"LostGhostyOld",
+"DedLostGhosty",
+"LostGhosty",
+"PastaDakodaOLD",
+"LordxDakodaPN",
+"MissingCraft",
+"Portal",
+"SadPepper",
+"Doggy Phase 4",
+"Doggy Phase 3",
+"Doggy Phase 2",
+"Doggy Phase 1",
+"FoxyPhase2",
+"Foxy",
+"MukFrostiggy",
+"BabyGengar",
+"GengarMemory",
+"BuriedAliveZompiggy",
+"Arhitno2",
+"PurinZee",
+"Zizzy",
+"Dawn",
+"BeelzeTigry",
+"BeelzePhase2",
+"TIO",
+"AmusiaPony",
+"AmusiaZuzyPhase4",
+"AmusiaZuzzyPhase3",
+"AmusiaZuzyPhase2",
+"AmusiaZuzzyPhase1",
+"PastaKolieOLD",
+"MXKoliePN",
+"ArchieSansno",
+"ScaredGreyOLD",
+"GreyOLD",
+"ScaredGrey",
+"GreyKenneth",
+"Arhinto",
+"GoldWillowHeadless",
+"GoldWillow",
+"CorruptedPeppaPenny",
+"CorruptedPepanew",
+"TrickyClowny",
+"Tricky",
+"TheMachine",
+"StarvedMrP",
+"StarvedKonaOld",
+"KonaStarved",
+"StarvedKona",
+"Arhinto",
+"CienKPig",
+"ShadowBonniePennyOld",
+"ShadowBonnieBunny",
+"TIOHellHole",
+"TIOVirsiculus",
+"SansnoGF",
+"ArchieSansno",
+"QuinientosKPig",
+"GreenParasee",
+"GreenRF",
+"PhotoNegativeRazeHeadless",
+"PhotoNegativeRazeHeadlessPhase2",
+"PhotoNegativeRazeFNATIMix",
+"PhotoNegativeRaze",
+"OrangeDinopiggy",
+"OrangeRF",
+"NightmareSansZee",
+"NightmareGF",
+"NightmareCupheadGeorgie",
+"NightmareCuphead",
+"NightmareBendyTIO",
+"NightmareBF",
+"Toxic",
+"RazeHellHoleOld",
+"RazeHellHole",
+"BlueGeorgie",
+"BlueRF",
+"GhostBoyFriend",
+"FurnaceRobbyOld",
+"FurnaceRobby",
+"PreyMarkus",
+"AlfisFinalEscapeXenophanesOld",
+"AlfisFinalEscapeXenophanes",
+"PurpleRF",
+"RacerMarioDoggyOLD",
+"RacerMario",
+"MXDemise",
+"MXOLD",
+"MX",
+"UnbeatableBowser",
+"DogHunt",
+"MrSys",
+"Somari",
+"FatalErrorOldest",
+"FatalErrorOld",
+"FatalError",
+"TrueFatalErrorOldest",
+"TrueFatalErrorOld",
+"TrueFatalError",
+"BuriedAliveZompiggy",
+"BabyGengar",
+"GengarMemory",
+"MukFrostiggy",
+"Black Imposter (Double Kill)",
+"Black Imposter Danger (Mad)",
+"Black Imposter (Danger)",
+"Black Imposter",
+"TheBeastSpidella",
+"Black Impostor Parasite",
+"RelaxGhostBunny",
+"RelaxPolice",
+"RelaxGhostdoggy",
+"SmallSillyBilly",
+"SillyBilly",
+"SinkSonicGhost",
+"SinkGiraffy",
+"RashExeHalloween",
+"SkellyPiggyJelly",
+"Twins",
+"FlippyGeorgie",
+"Zizzy.hx",
+"RoadDelta",
+"RoadTorcher",
+"TrickyClowny",
+"Tricky",
+"Partygoer",
+"Pony2D",
+"RagePony",
+"TheBeastSpidella",
+"RushGeorgie",
+"RushV2",
+"HankFoxy",
+"Hank",
+"Kenny",
+"SeekerMonster",
+"HerobrineGlitchy",
+"TraumaSonicEXE",
+"SkarletBunny",
+"LuaFromage",
+"FinnbeyBlox",
+"SonicObituary",
+"SonicEXEObituaryPhase",
+"SonicEXEObituary",
+"JasonVoorheesDrowned",
+"JasonVoorheesDrownedKnife",
+"JasonVoorheesBlizzard",
+"JasonVoorhees",
+"HikerBack",
+"Hiker",
+"Xavier",
+"FrostBiteXaiver",
+"RazeSuffering",
+"RazeHappyEnd",
+"RazeMidSuffer",
+"RazeUnHappy",
+"RazeWishling",
+"RazeHellHoleOld",
+"RazeHellHole",
+"MrStitchyVirsiculus",
+"TIOVirsiculus",
+"RazeVirsiculusFlying",
+"RazeVirsiculus",
+"JulianRaze",
+"ChedderOLD",
+"CheddarRaze",
+"SUSRaze",
+"ImpostorRaze",
+"CrazyMiniRazeOLD",
+"MiniRazeTIO",
+"NormalMiniRaze",
+"RazeExe",
+"HankRaze",
+"Budgey",
+"rAr",
+"CrazyrAz",
+"OswaldBunnyShot",
+"OsBunny",
+"LeakRaze",
+"RashExeTrinity",
+"DessaEnd",
+"RewritenGeorgiePhase2",
+"RewritenGeorgie",
+"DessaRash",
+"LordDakodaTrinity",
+"SlenderZizzy",
+"AITimothy",
+"Spider",
+"BoilingMari",
+"VoidMemory",
+"MaxDesignPro",
+"NuggetGoodEnding",
+"NuggetHat",
+"NuggetMaxStyle",
+"Nugget",
+"EvilMaxDesignPro",
+"KnucklesBillyTGT",
+"ShadowFoxyShovel",
+"ShadowFoxy",
+"SonicWillowOld",
+"SonicZizzy",
+"CrazyTailsWilliamOld",
+"CrazyTailsPony",
+"DeadKnuckesDadOld",
+"DeadKnuckesWillow",
+"Lola",
+"StarvedSantiago",
+"CorruptedSantiago",
+"FrostBiteSantiago",
+"DoesBadThingsMiku",
+"ScoobyDooDoggyBlack",
+"ScoobyDooDoggy",
+"CartoonVelma",
+"Velma",
+"CartoonScoobyDooDoggy",
+"BlueGeorgie",
+"BlueRF",
+"GreenParasee",
+"GreenRF",
+"OrangeDinopiggy",
+"OrangeRF",
+"PurpleRF",
+"HuggyStitchy",
+"HuggyWuggyNew",
+"BunzoBunny",
+"BunzoBunnyNew",
+"MommyParasee",
+"MommyLongLengsNew",
+"Theodore",
+"Catnap",
+"MonsterCatNap",
+"DogDay",
+"Craftycorn",
+"PiggyBook2Dessa",
+"PiggyBook2Player",
+"PiggyBook2Rash",
+"PiggyBook2Willow",
+"PiggyBook2TigryUniform",
+"PiggyBook2Zizzy",
+"PiggyBook2Raze",
+"PiggyBook2Alfis",
+"PiggyBook2Kolie",
+"PiggyBook2Dakoda",
+"PiggyBook2Archie",
+"PiggyBook2Markus",
+"PiggyBook2Spidella",
+"PiggyBook2Piggy",
+"PiggyBook2Tigry",
+"PiggyBook2Delta",
+"PiggyBook2Felix",
+"PiggyBook2TIO",
+"PiggyBook2ZizzyXmas",
+"PiggyBook2Zuzy",
+"PiggyBook2Frostiggy",
+"PiggyBook2Felix2",
+"SquidwardParasee",
+"SquidwardNormalParasee",
+"DoomsdaySquidward",
+"PlanktonCrawlingTrap",
+"FacelessSpongeBob",
+"SecretFormulaSpongeBob",
+"FacelessPatrick",
+"CoconutFredCocoa",
+"MasacrePennyOLD",
+"MassacrePenny",
+"PropagandaSpongebob",
+"JeffyPhaseOne",
+"JeffyAngry",
+"JeffyPhaseTwo",
+"DoesEvilThingsGuy",
+"DoesEvilThingsGuyTable",
+"MarvinNormal",
+"MarvinAngry",
+"MarvinWorried",
+"MarvinGoofy",
+"Rose",
+"Teleretro",
+"MonikaBunnyHotLineHair2",
+"MonikaBunnyHotLineHair1",
+"MonikaBunnyHotLine",
+"NikkuMoriokaElecktra",
+"YuriZizzyHotLine",
+"Dosidicus",
+"CorruptedGabriel",
+"CorruptedGabrielSwordRopes",
+"CorruptedGabrielSword",
+"FrontCorruptedGabriel",
+"FakeSurvivorGabriel",
+"ShadowGabriel",
+"XenoBriel",
+"NormalFrostBiteGabriel",
+"FrostBiteGabriel",
+"MadRobotSandyRobby",
+"RobotSandyRobby",
+"DoodleBobGeorgie",
+"NeptuneTIO",
+"HeroSpongeBobGuitarGeorgie",
+"HeroSpongeBobGeorgie",
+"IntruderKitty",
+"AlternateStitchy",
+"SnatcherZizzy",
+"AngelGabrielAngel",
+"FredBlackImpostor",
+"HankPig",
+"YellowGuyBudgey",
+"patientDuckGuy",
+"DuckGuy",
+"DuckGuyCrove",
+"YellowGuy",
+"MeatGuyMrP",
+"MeatMan",
+"TunaGuyBall",
+"SpinachCan",
+"BreadBoy",
+"BigTunaGuyPhenna",
+"MonsterCan",
+"CrazyNatsukiMousy",
+"NatsukiMousyFaceless",
+"NatsukiMousy",
+"MonikaBunnyHairTwo",
+"MonikaBunnyHairOne",
+"MonikaBunny",
+"YuriZizzyOld",
+"YuriZizzyMarkovFront",
+"YuriZizzyMarkov",
+"YuriZizzy",
+"DepresedSayori",
+"HappySayoriPenny",
+"SayoriPenny",
+"LibitinaStanding",
+"Libitina",
+"DriverBilly",
+"TheBoiledOne",
+"Room",
+"SarahTrills",
+"JimHidden",
+"Jim",
+"John",
+"FleshWoodDoggy",
+"DaShopMan",
+"CharlesG",
+"StarvedCharlesG",
+"DilemmaPenny",
+"AnnieDilema",
+"Annie",
+"ToneItDownPenny",
+"LegacyAnnie",
+"DilemmaAlfis",
+"GarcelloDilemaLeft",
+"GarcelloDilema",
+"Garcello",
+"LegacyAnnieDemon",
+"CharlieSteakCartoony",
+"CharlieSteak",
+"RedCartoony",
+"Red",
+"CharlieSteakEnding",
+"RedEnding"
+}
+
+
+local selectedMorph = morphNames[""]
+
+TabMain:CreateDropdown({
+    Name = "Select Morph",
+    Options = morphNames,
+    Flag = "MorphSelector",
+    Callback = function(Option)
+        local sel = Option
+        if typeof(sel) == "table" then sel = sel[1] end -- defesa caso Rayfield retorne tabela
+        selectedMorph = tostring(sel or "")
+        -- executa imediatamente quando selecionar
+        if selectedMorph ~= "" then
+            pcall(function()
+                game:GetService("ReplicatedStorage"):WaitForChild("CharChange"):InvokeServer(selectedMorph)
+            end)
+        end
+    end,
+})
+
+-- Botão opcional para aplicar novamente o selecionado
+TabMain:CreateButton({
+    Name = "Force Morph",
+    Callback = function()
+        if selectedMorph and selectedMorph ~= "" then
+            pcall(function()
+                game:GetService("ReplicatedStorage"):WaitForChild("CharChange"):InvokeServer(selectedMorph)
+            end)
+        end
+    end,
+})
+
+-- Give Coins Button
+TabMain:CreateButton({
+    Name = "Give Coins",
+    Callback = function()
+        pcall(function()
+            game:GetService("ReplicatedStorage").GivePlayerCoins:FireServer()
+        end)
+    end,
+})
+
+-- Give Badges Feature
+local badgeNames = {
+    "Cho Cho", "Abandoned by gabriel", "The Bootleg archie", "Giant Enemy", 
+    "Impostor in the skyes", "Fatal Mess", "Final Escape", "Hidden Shadows", 
+    "You are a traitor", "Pixel By Pixel", "Rainbow Madness", "The Gang", 
+    "Trapped in hell", "Triple Challenge", "Unknown glitch"
+}
+local selectedBadge = badgeNames[""]
+
+TabMain:CreateDropdown({
+    Name = "Select Badge",
+    Options = badgeNames,
+    Callback = function(Option)
+        selectedBadge = tostring(Option)
+    end,
+})
+
+TabMain:CreateButton({
+    Name = "Give Selected Badge",
+    Callback = function()
+        if selectedBadge and selectedBadge ~= "" then
+            pcall(function()
+                game:GetService("ReplicatedStorage").Givebadge:FireServer(selectedBadge)
+            end)
+        end
+    end,
+})
+
+--// Aba Teleport
+local TabTeleport = Window:CreateTab("Teleport", 4483345998)
+
+TabTeleport:CreateButton({
+    Name = "Generate Hide Place",
+    Callback = function()
+        if not workspace:FindFirstChild("placefff") then
+            local baseplate = Instance.new("Part")
+            baseplate.Name = "placefff"
+            baseplate.Size = Vector3.new(2048, 1, 2048)
+            baseplate.Position = Vector3.new(0, 2048, 0)
+            baseplate.Anchored = true
+            baseplate.CanCollide = true
+            baseplate.Material = Enum.Material.Grass
+            baseplate.Parent = workspace
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Tween *SAFE*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = lp.Character.HumanoidRootPart.Position
+            local tweeninfo = TweenInfo.new(1, Enum.EasingStyle.Linear)
+            local tween = TweenService:Create(lp.Character.HumanoidRootPart, tweeninfo, {CFrame = CFrame.new(0, 2053, 0)})
+            tween:Play()
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Instant *RISK*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = lp.Character.HumanoidRootPart.Position
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(0, 2053, 0)
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Return to Last Position Before Teleport (*RISK*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(lastBaseplatePosition)
+        end
+    end,
+})
+
+--// Aba Visuals
+local TabVisuals = Window:CreateTab("Visuals", 6034509993)
+
+TabVisuals:CreateToggle({
+    Name = "Keep Brightness Active",
+    CurrentValue = false,
+    Flag = "BrightnessLoop",
+    Callback = function(Value)
+        brightnessLoop = Value
+        if Value then
+            task.spawn(function()
+                while brightnessLoop do
+                    Lighting.Brightness = 2
+                    Lighting.ClockTime = 14
+                    Lighting.FogEnd = 100000
+                    Lighting.GlobalShadows = true
+                    Lighting.Technology = "Future"
+
+                    Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+                    task.wait()
+                end
+            end)
+        end
+    end,
+})
+
+--// Aba Tools
+local TabTools = Window:CreateTab("Tools", 6022668898)
+
+TabTools:CreateButton({
+    Name = "Give BTools",
+    Callback = function()
+        local function randomString()
+            local length = math.random(10,20)
+            local array = {}
+            for i = 1, length do
+                array[i] = string.char(math.random(32, 126))
+            end
+            return table.concat(array)
+        end
+
+        local lp = Players.LocalPlayer
+        local hammer = Instance.new("HopperBin")
+        hammer.Name = randomString()
+        hammer.BinType = 4
+        hammer.Parent = lp.Backpack
+
+        local cloneTool = Instance.new("HopperBin")
+        cloneTool.Name = randomString()
+        cloneTool.BinType = 3
+        cloneTool.Parent = lp.Backpack
+
+        local grabTool = Instance.new("HopperBin")
+        grabTool.Name = randomString()
+        grabTool.BinType = 2
+        grabTool.Parent = lp.Backpack
+    end,
+})
+
+TabTools:CreateButton({
+    Name = "Load Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 16,
+    Callback = function(Value)
+        savedWalkSpeed = Value
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = Value
+        end
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 300},
+    Increment = 1,
+    Suffix = " JP",
+    CurrentValue = 50,
+    Callback = function(Value)
+        savedJumpPower = Value
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").JumpPower = Value
+        end
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        infiniteJumpEnabled = Value
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Sprint (Hold Key)",
+    CurrentValue = false,
+    Flag = "SprintToggle",
+    Callback = function(Value)
+        sprintEnabled = Value
+        if not Value and holdingSprint then
+            holdingSprint = false
+            local lp = Players.LocalPlayer
+            if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+                lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+            end
+        end
+    end,
+})
+
+TabTools:CreateKeybind({
+    Name = "Sprint Key",
+    CurrentKeybind = "LeftShift",
+    HoldToInteract = false,
+    Flag = "SprintKey",
+    Callback = function(Key)
+        sprintKey = toKeyCode(Key)
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "Sprint Speed",
+    Range = {20, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 50,
+    Callback = function(Value)
+        sprintSpeed = Value
+    end,
+})
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if not sprintEnabled then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = true
+        local lp = Players.LocalPlayer
+        if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = sprintSpeed
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gpe)
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = false
+        local lp = Players.LocalPlayer
+        if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+        end
+    end
+end)
+
+Players.LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = savedWalkSpeed
+    humanoid.JumpPower = savedJumpPower
+    if sprintEnabled and holdingSprint then
+        humanoid.WalkSpeed = sprintSpeed
+    end
+end)
+
+-- Listener Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+-- Persistência WalkSpeed e JumpPower após respawn
+Players.LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = savedWalkSpeed
+    humanoid.JumpPower = savedJumpPower
+end)
+
+-- Aplica valores se o personagem já existir
+local lp = Players.LocalPlayer
+if lp.Character then
+    local humanoid = lp.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = savedWalkSpeed
+        humanoid.JumpPower = savedJumpPower
+    end
+end

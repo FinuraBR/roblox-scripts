@@ -1,0 +1,14 @@
+-- https://www.roblox.com/games/16055759911/NEW-Mega-Luxury-Bus-Tycoon
+
+getgenv().collect = true
+
+while getgenv().collect == true do
+    task.wait(1)
+for _,v in pairs(workspace.Game.Tycoons["3"].Collectors.Collector.stuff:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0) --0 is touch
+task.wait()
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1) -- 1 is untouch
+end
+end
+end

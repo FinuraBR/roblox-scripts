@@ -1,0 +1,14 @@
+-- https://www.roblox.com/games/16601621907/FNAF-Security-Breach-RP-ReWritten#!/about
+
+-- badges:
+
+game:GetService("ReplicatedStorage").FoxyAwardBadge:FireServer()
+
+game:GetService("ReplicatedStorage").CreeperMontyAwardBadge:FireServer()
+
+game:GetService("ReplicatedStorage").BonnieAwardBadge:FireServer()
+--------------------
+local args = {
+	game:GetService("ReplicatedFirst"):WaitForChild("Characters"):WaitForChild("Chica"):WaitForChild("RIG_Glamrock_Chica")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("CharChange"):FireServer(unpack(args))

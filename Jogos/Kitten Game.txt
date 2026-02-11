@@ -1,0 +1,14 @@
+-- https://www.roblox.com/games/13482468151/Kitten-Game
+
+-- coin
+
+getgenv().coin = true
+
+while getgenv().coin == true do
+    task.wait()
+for _,v in pairs(workspace.CoinSpawner.Coin:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+v.Parent.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+end
+end
+end

@@ -1,0 +1,31 @@
+-- https://www.roblox.com/games/92775789555257/PRESTIGE-Dropper-Incremental-Tycoon
+
+-- coin
+
+getgenv().coin = true
+
+while getgenv().coin == true do
+task.wait(1)
+for _,v in pairs(workspace.CoinMech.CoinsSpawned:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0) --0 is touch
+task.wait()
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1) -- 1 is untouch
+end
+end
+end
+
+--buttons
+
+getgenv().button = true
+
+while getgenv().button == true do
+    task.wait(1)
+for _,v in pairs(workspace.Plots.Plot.Buttons:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0) --0 is touch
+task.wait()
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1) -- 1 is untouch
+end
+end
+end

@@ -1,0 +1,3 @@
+-- https://www.roblox.com/games/6439473270/Fazbear-Entertainment-The-Roleplay
+
+game:GetService("ReplicatedStorage").Events.AwardBadge:FireServer() -- entre os parenteses coloque o id da badge

@@ -1,0 +1,33 @@
+-- https://www.roblox.com/games/2136022267/FNAF-The-Original-Trilogy-Roleplay
+-- badge script
+
+function abc()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.OfficeTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.DiningAreaTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.TownTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.OfficeTeleport2.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.MainAreaTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.CityTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.OfficeTeleport3.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.FNAF3Cam09Teleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.FNAF3FunlandTeleport.tele1.Position)
+task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(workspace.DinerTP1.tele1.Position)
+end
+
+abc()
+
+for _, v in ipairs(workspace:GetDescendants()) do
+       if v.Name == "BadgeAwarderScript" then
+        task.wait(1)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame
+        end
+end

@@ -1,0 +1,9 @@
+-- https://www.roblox.com/games/373513488/FNAF-TPRR-NEW
+
+-- money
+
+while wait(1) do
+if game.Workspace:WaitForChild("Tape") then
+    game.Workspace.Tape.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+end
+end

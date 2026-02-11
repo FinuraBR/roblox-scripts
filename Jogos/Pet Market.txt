@@ -1,0 +1,58 @@
+-- https://www.roblox.com/games/18142453305/Pet-Market
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "Pet Market (by FinuraBR)", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+getgenv().autoclick = true
+getgenv().autocase = true
+getgenv().selectcase = "1", "2", "3", "4", "5"
+
+function autoclick()
+	while getgenv().autoclick == true do
+		game:GetService("ReplicatedStorage").Events.ClickPet:FireServer()
+		wait()
+	end
+end
+
+function autocase()
+	while getgenv().autocase == true do
+		game:GetService("ReplicatedStorage").Events.OpenCrate:FireServer((getgenv().selectcase))
+		wait()
+	end
+end
+
+local Tab = Window:MakeTab({
+	Name = "Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Auto Click",
+	Default = false,
+	Callback = function(Value)
+		getgenv().autoclick = Value
+		autoclick()
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Case",
+	Default = false,
+	Callback = function(Value)
+		getgenv().autocase = Value
+		autocase()
+	end    
+})
+
+Tab:AddDropdown({
+	Name = "Select Case",
+	Default = "1",
+	Options = {"1", "2", "3", "4", "5"},
+	Callback = function(Value)
+		getgenv().selectcase = Value
+	end    
+})
+
+
+OrionLib:Init()

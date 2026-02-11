@@ -1,0 +1,58 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+local Window = OrionLib:MakeWindow({Name = "FNaF Tycoon: Remake (by FinuraBR)", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+
+getgenv().autocoletar = true
+getgenv().autocomprar = true
+
+function autocoletar()
+	while getgenv().autocoletar == true do
+		for _, v in workspace.TycoonsModel.Tycoons["Freddy's Location"].Essentials.Giver:GetDescendants() do
+       if v:IsA("TouchTransmitter") then
+            firetouchinterest(v.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+            task.wait(0.1)
+            firetouchinterest(v.Parent,  game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+       end
+   end
+		wait()
+	end
+end
+
+function autocomprar()
+	while getgenv().autocomprar == true do
+	game:GetService("CoreGui").PurchasePrompt.Enabled = false	
+	for _, v in workspace.TycoonsModel.Tycoons["Freddy's Location"].Buttons:GetDescendants() do
+       if v:IsA("TouchTransmitter") then
+            firetouchinterest(v.Parent, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+            task.wait(0.1)
+            firetouchinterest(v.Parent,  game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+       end
+   end
+		wait()
+	end
+end
+
+local Tab = Window:MakeTab({
+	Name = "Game",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Auto Coletar",
+	Default = false,
+	Callback = function(Value)
+		getgenv().autocoletar = Value
+		autocoletar()
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Comprar",
+	Default = false,
+	Callback = function(Value)
+		getgenv().autocomprar = Value
+		autocomprar()
+	end    
+})
+
+OrionLib:Init()

@@ -1,0 +1,345 @@
+-- https://www.roblox.com/games/95519350308736/Backrooms-Incremental-Remastered
+
+--// Load Rayfield Library
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+--// Window
+local Window = Rayfield:CreateWindow({
+    Name = "Universal GUI (by FinuraBR)",
+    LoadingTitle = "Universal GUI Script",
+    LoadingSubtitle = "by FinuraBR",
+    ToggleUIKeybind = "Z",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "RayfieldConfigs",
+        FileName = "Universal GUI by FinuraBR"
+    },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
+
+--// Serviços
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+--// Variáveis globais
+local lastBaseplatePosition = Vector3.new(0, 2053, 0)
+local brightnessLoop = false
+local infiniteJumpEnabled = false
+local autoFarmEnabled = false -- Variável do novo Toggle
+local savedWalkSpeed = 16
+local savedJumpPower = 50
+
+-- Variáveis Sprint
+local sprintEnabled = false
+local sprintKey = Enum.KeyCode.LeftShift
+local sprintSpeed = 100
+local holdingSprint = false
+
+local function toKeyCode(k)
+    if typeof(k) == "EnumItem" then
+        return k
+    end
+    if type(k) == "string" then
+        if Enum.KeyCode[k] then
+            return Enum.KeyCode[k]
+        end
+        local up = k:upper()
+        if Enum.KeyCode[up] then
+            return Enum.KeyCode[up]
+        end
+    end
+    return Enum.KeyCode.LeftShift
+end
+
+--// Aba Auto Farm (NOVA)
+local TabFarm = Window:CreateTab("Auto Farm", 4483345998)
+
+TabFarm:CreateToggle({
+    Name = "Auto Collect Items",
+    CurrentValue = false,
+    Flag = "AutoFarmItems",
+    Callback = function(Value)
+        autoFarmEnabled = Value
+        
+        if Value then
+            -- Iniciamos um loop em uma thread separada (task.spawn)
+            task.spawn(function()
+                while autoFarmEnabled do
+                    -- Verifica se o caminho no workspace existe para evitar erros
+                    local spawnedFolder = workspace:FindFirstChild("Environment") 
+                        and workspace.Environment:FindFirstChild("Incremental") 
+                        and workspace.Environment.Incremental:FindFirstChild("Spawning") 
+                        and workspace.Environment.Incremental.Spawning:FindFirstChild("Spawned")
+
+                    if spawnedFolder then
+                        local items = spawnedFolder:GetDescendants()
+                        
+                        for _, v in pairs(items) do
+                            -- Se o toggle for desligado durante o percurso, para o loop
+                            if not autoFarmEnabled then break end
+                            
+                            if v:IsA("MeshPart") and v.Parent and v.Parent:IsA("Model") then
+                                local lp = Players.LocalPlayer
+                                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                                    -- Teleporta para o item
+                                    lp.Character.HumanoidRootPart.CFrame = v.CFrame
+                                    task.wait(0.2) -- Delay para o jogo registrar a coleta (ajuste se necessário)
+                                end
+                            end
+                        end
+                    end
+                    task.wait(0.5) -- Pequena pausa antes de checar se novos itens apareceram
+                end
+            end)
+        end
+    end,
+})
+
+--// Aba Teleport
+local TabTeleport = Window:CreateTab("Teleport", 4483345998)
+
+TabTeleport:CreateButton({
+    Name = "Generate Hide Place",
+    Callback = function()
+        if not workspace:FindFirstChild("placefff") then
+            local baseplate = Instance.new("Part")
+            baseplate.Name = "placefff"
+            baseplate.Size = Vector3.new(2048, 1, 2048)
+            baseplate.Position = Vector3.new(0, 2048, 0)
+            baseplate.Anchored = true
+            baseplate.CanCollide = true
+            baseplate.Material = Enum.Material.Grass
+            baseplate.Parent = workspace
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Tween *SAFE*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = lp.Character.HumanoidRootPart.Position
+            local tweeninfo = TweenInfo.new(1, Enum.EasingStyle.Linear)
+            local tween = TweenService:Create(lp.Character.HumanoidRootPart, tweeninfo, {CFrame = CFrame.new(0, 2053, 0)})
+            tween:Play()
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Instant *RISK*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = lp.Character.HumanoidRootPart.Position
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(0, 2053, 0)
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Return to Last Position Before Teleport (*RISK*)",
+    Callback = function()
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+            lp.Character.HumanoidRootPart.CFrame = CFrame.new(lastBaseplatePosition)
+        end
+    end,
+})
+
+--// Aba Visuals
+local TabVisuals = Window:CreateTab("Visuals", 6034509993)
+
+TabVisuals:CreateToggle({
+    Name = "Keep Brightness Active",
+    CurrentValue = false,
+    Flag = "BrightnessLoop",
+    Callback = function(Value)
+        brightnessLoop = Value
+        if Value then
+            task.spawn(function()
+                while brightnessLoop do
+                    Lighting.Brightness = 2
+                    Lighting.ClockTime = 14
+                    Lighting.FogEnd = 100000
+                    Lighting.GlobalShadows = true
+                    Lighting.Technology = "Future"
+
+                    Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+                    task.wait()
+                end
+            end)
+        end
+    end,
+})
+
+--// Aba Tools
+local TabTools = Window:CreateTab("Tools", 6022668898)
+
+TabTools:CreateButton({
+    Name = "Give BTools",
+    Callback = function()
+        local function randomString()
+            local length = math.random(10,20)
+            local array = {}
+            for i = 1, length do
+                array[i] = string.char(math.random(32, 126))
+            end
+            return table.concat(array)
+        end
+
+        local lp = Players.LocalPlayer
+        local hammer = Instance.new("HopperBin")
+        hammer.Name = randomString()
+        hammer.BinType = 4
+        hammer.Parent = lp.Backpack
+
+        local cloneTool = Instance.new("HopperBin")
+        cloneTool.Name = randomString()
+        cloneTool.BinType = 3
+        cloneTool.Parent = lp.Backpack
+
+        local grabTool = Instance.new("HopperBin")
+        grabTool.Name = randomString()
+        grabTool.BinType = 2
+        grabTool.Parent = lp.Backpack
+    end,
+})
+
+TabTools:CreateButton({
+    Name = "Load Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 16,
+    Callback = function(Value)
+        savedWalkSpeed = Value
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = Value
+        end
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 300},
+    Increment = 1,
+    Suffix = " JP",
+    CurrentValue = 50,
+    Callback = function(Value)
+        savedJumpPower = Value
+        local lp = Players.LocalPlayer
+        if lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").JumpPower = Value
+        end
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        infiniteJumpEnabled = Value
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Sprint (Hold Key)",
+    CurrentValue = false,
+    Flag = "SprintToggle",
+    Callback = function(Value)
+        sprintEnabled = Value
+        if not Value and holdingSprint then
+            holdingSprint = false
+            local lp = Players.LocalPlayer
+            if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+                lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+            end
+        end
+    end,
+})
+
+TabTools:CreateKeybind({
+    Name = "Sprint Key",
+    CurrentKeybind = "LeftShift",
+    HoldToInteract = false,
+    Flag = "SprintKey",
+    Callback = function(Key)
+        sprintKey = toKeyCode(Key)
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "Sprint Speed",
+    Range = {20, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 50,
+    Callback = function(Value)
+        sprintSpeed = Value
+    end,
+})
+
+--// Listeners de Input
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if not sprintEnabled then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = true
+        local lp = Players.LocalPlayer
+        if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = sprintSpeed
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gpe)
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = false
+        local lp = Players.LocalPlayer
+        if lp and lp.Character and lp.Character:FindFirstChildOfClass("Humanoid") then
+            lp.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+        end
+    end
+end)
+
+-- Listener Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+-- Persistência WalkSpeed e JumpPower após respawn
+Players.LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    humanoid.WalkSpeed = savedWalkSpeed
+    humanoid.JumpPower = savedJumpPower
+    if sprintEnabled and holdingSprint then
+        humanoid.WalkSpeed = sprintSpeed
+    end
+end)
+
+-- Aplica valores se o personagem já existir
+if lp.Character then
+    local humanoid = lp.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = savedWalkSpeed
+        humanoid.JumpPower = savedJumpPower
+    end
+end

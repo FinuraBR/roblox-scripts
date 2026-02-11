@@ -1,0 +1,11 @@
+-- https://www.roblox.com/games/16534922321/Christmas-Freddys-Reality#!/about
+
+-- morph
+
+workspace.FinuraBR.Options.Nametag:FireServer()
+
+local args = {
+    [1] = "JJ"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("Morph"):FireServer(unpack(args))

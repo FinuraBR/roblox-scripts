@@ -1,0 +1,6 @@
+-- https://www.roblox.com/games/6812590210/FNAF-1-1992-Branch-RP
+
+local args = {
+	game:GetService("ReplicatedStorage"):WaitForChild("CharacterModels"):WaitForChild("Bonnie")
+}
+game:GetService("ReplicatedStorage"):WaitForChild("ChangeChar"):FireServer(unpack(args))

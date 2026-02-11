@@ -1,0 +1,22 @@
+-- https://www.roblox.com/games/132733938805360/ROCKSTARS-Freddys-Revamped-Roleplay
+-- para funcionar vc deve primeiro spawnar como um adulto e depois usar o script
+
+local args = {
+	{
+		"", -- entre as aspas coloque o nome do morph
+		CFrame.new(-516.6056518554688, 1.9829444885253906, -65.45014953613281, -0.9999861717224121, 0, 0.005265624728053808, 0, 1, 0, -0.005265624728053808, 0, -0.9999861717224121),
+		{
+			Name = "",
+			Description1 = "",
+			Price = 0,
+			ID = "",
+			Icon = 74503715019123,
+			Description2 = ""
+		}
+	}
+}
+game:GetService("ReplicatedStorage"):WaitForChild("MorphCharacter"):FireServer(unpack(args))
+---------------------------------------------------------------------------------
+game:GetService("ReplicatedStorage").AwardBadge:FireServer(); -- entre os parenteses coloque o id da badge
+---------------------------------------------------------------------------------
+game:GetService("ReplicatedStorage").AddMoney:FireServer() -- entre os parenteses coloque o tanto de dinheiro q vc quer adicionar

@@ -1,0 +1,10 @@
+-- https://www.roblox.com/games/11448052802/XMAS-Pet-Rift
+
+-- tp dos drops de uma area para o player
+
+for _,v in pairs(workspace.ObjectsFolder.VOLCANO_MATTER:GetDescendants()) do
+if v:IsA("BillboardGui") then
+    task.wait(1)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.Parent.CFrame
+end
+end

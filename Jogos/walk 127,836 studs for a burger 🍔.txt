@@ -1,0 +1,8 @@
+auto collect:
+
+while true do
+for i, v in workspace.Maps.Map1.BoostDebris:GetChildren() do
+v.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+end
+task.wait(1)
+end

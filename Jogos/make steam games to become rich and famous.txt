@@ -1,0 +1,14 @@
+-- auto buy
+
+getgenv().buttons = true
+
+while getgenv().buttons == true do
+    task.wait(1)
+for _,v in pairs(workspace.Areas:GetChildren()[3].Buttons:GetDescendants()) do
+if v:IsA("TouchTransmitter") then
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 0) --0 is touch
+task.wait(0.1)
+firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, v.Parent, 1) -- 1 is untouch
+end
+end
+end

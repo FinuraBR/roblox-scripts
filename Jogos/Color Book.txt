@@ -1,0 +1,380 @@
+-- https://www.roblox.com/games/6722921118/Color-Book
+
+--// Load Rayfield Library
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+
+--// Window
+local Window = Rayfield:CreateWindow({
+    Name = "Universal GUI (by ツFinuraBR)",
+    LoadingTitle = "Universal GUI Script",
+    LoadingSubtitle = "by ツFinuraBR",
+    ToggleUIKeybind = "Z",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "RayfieldConfigs",
+        FileName = "Universal GUI by ツFinuraBR"
+    },
+    Discord = { Enabled = false },
+    KeySystem = false
+})
+
+--// Serviços
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+--// Variáveis Principais (QUE FALTAVAM)
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+--// Variáveis de Controle
+local autoFarmEnabled = false -- Definido aqui para evitar erro
+local lastBaseplatePosition = Vector3.new(0, 2053, 0)
+local brightnessLoop = false
+local infiniteJumpEnabled = false
+local savedWalkSpeed = 16
+local savedJumpPower = 50
+
+-- Variáveis Sprint
+local sprintEnabled = false
+local sprintKey = Enum.KeyCode.LeftShift
+local sprintSpeed = 100
+local holdingSprint = false
+
+local function toKeyCode(k)
+    if typeof(k) == "EnumItem" then
+        return k
+    end
+    if type(k) == "string" then
+        if Enum.KeyCode[k] then
+            return Enum.KeyCode[k]
+        end
+        local up = k:upper()
+        if Enum.KeyCode[up] then
+            return Enum.KeyCode[up]
+        end
+    end
+    return Enum.KeyCode.LeftShift
+end
+
+--// Atualiza a câmera caso o player morra/respawne
+Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
+    Camera = Workspace.CurrentCamera
+end)
+
+--// Aba Auto Farm (MODO: ANTI-CLIP SIZE CALCULATION)
+local TabFarm = Window:CreateTab("Auto Farm", 4483345998)
+
+TabFarm:CreateToggle({
+    Name = "Smart Bring (Auto Distance)",
+    CurrentValue = false,
+    Flag = "AutoFarmItems", -- A Bind usa essa Flag para achar o botão
+    Callback = function(Value)
+        autoFarmEnabled = Value
+        
+        if Value then
+            task.spawn(function()
+                while autoFarmEnabled do
+                    -- Verifica se a câmera existe antes de tentar usar
+                    if not Camera then Camera = Workspace.CurrentCamera end
+
+                    local descendants = Workspace:GetDescendants()
+                    
+                    for _, v in pairs(descendants) do
+                        if not autoFarmEnabled then break end
+
+                        if v:IsA("SelectionBox") then
+                            local itemPart = v.Parent 
+                            
+                            if itemPart and itemPart:IsA("BasePart") then
+                                -- 1. SALVA ESTADO ORIGINAL
+                                local originalCFrame = itemPart.CFrame
+                                local originalCollide = itemPart.CanCollide
+                                local originalTransparency = itemPart.Transparency
+                                
+                                -- 2. CÁLCULO DE TAMANHO
+                                local partSize = itemPart.Size.Magnitude / 2
+                                local distanceToMove = partSize + 6
+                                
+                                -- 3. TRAZ O OBJETO
+                                itemPart.CanCollide = false
+                                itemPart.Transparency = 0.6 
+                                
+                                -- Posiciona na frente da câmera
+                                local targetPos = Camera.CFrame + (Camera.CFrame.LookVector * distanceToMove)
+                                itemPart.CFrame = CFrame.new(targetPos.Position)
+                                
+                                -- 4. TEMPO DE PINTURA
+                                task.wait() 
+                                
+                                -- 5. DEVOLVE
+                                itemPart.CFrame = originalCFrame
+                                itemPart.CanCollide = originalCollide
+                                itemPart.Transparency = originalTransparency
+                            end
+                        end
+                    end
+                    task.wait(1) 
+                end
+            end)
+        end
+    end,
+})
+
+--// NOVA BIND ADICIONADA AQUI //--
+TabFarm:CreateKeybind({
+    Name = "Toggle Auto Farm Bind",
+    CurrentKeybind = "X",
+    HoldToInteract = false,
+    Flag = "KeybindAutoFarm",
+    Callback = function()
+        -- Pega o status atual do Toggle "AutoFarmItems" e inverte
+        if Rayfield.Flags["AutoFarmItems"] then
+            local currentValue = Rayfield.Flags["AutoFarmItems"].CurrentValue
+            Rayfield.Flags["AutoFarmItems"]:Set(not currentValue)
+        end
+    end,
+})
+
+--// Aba Teleport
+local TabTeleport = Window:CreateTab("Teleport", 4483345998)
+
+TabTeleport:CreateButton({
+    Name = "Generate Hide Place",
+    Callback = function()
+        if not Workspace:FindFirstChild("placefff") then
+            local baseplate = Instance.new("Part")
+            baseplate.Name = "placefff"
+            baseplate.Size = Vector3.new(2048, 1, 2048)
+            baseplate.Position = Vector3.new(0, 2048, 0)
+            baseplate.Anchored = true
+            baseplate.CanCollide = true
+            baseplate.Material = Enum.Material.Grass
+            baseplate.Parent = Workspace
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Tween *SAFE*)",
+    Callback = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = LocalPlayer.Character.HumanoidRootPart.Position
+            local tweeninfo = TweenInfo.new(1, Enum.EasingStyle.Linear)
+            local tween = TweenService:Create(LocalPlayer.Character.HumanoidRootPart, tweeninfo, {CFrame = CFrame.new(0, 2053, 0)})
+            tween:Play()
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Teleport to Hide Place (Instant *RISK*)",
+    Callback = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            lastBaseplatePosition = LocalPlayer.Character.HumanoidRootPart.Position
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 2053, 0)
+        end
+    end,
+})
+
+TabTeleport:CreateButton({
+    Name = "Return to Last Position Before Teleport (*RISK*)",
+    Callback = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(lastBaseplatePosition)
+        end
+    end,
+})
+
+--// Aba Visuals
+local TabVisuals = Window:CreateTab("Visuals", 6034509993)
+
+TabVisuals:CreateToggle({
+    Name = "Keep Brightness Active",
+    CurrentValue = false,
+    Flag = "BrightnessLoop",
+    Callback = function(Value)
+        brightnessLoop = Value
+        if Value then
+            task.spawn(function()
+                while brightnessLoop do
+                    Lighting.Brightness = 2
+                    Lighting.ClockTime = 14
+                    Lighting.FogEnd = 100000
+                    Lighting.GlobalShadows = true
+                    Lighting.Technology = "Future"
+                    Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+                    task.wait()
+                end
+            end)
+        end
+    end,
+})
+
+--// Aba Tools
+local TabTools = Window:CreateTab("Tools", 6022668898)
+
+TabTools:CreateButton({
+    Name = "Give BTools",
+    Callback = function()
+        local function randomString()
+            local length = math.random(10,20)
+            local array = {}
+            for i = 1, length do
+                array[i] = string.char(math.random(32, 126))
+            end
+            return table.concat(array)
+        end
+
+        local hammer = Instance.new("HopperBin")
+        hammer.Name = randomString()
+        hammer.BinType = 4
+        hammer.Parent = LocalPlayer.Backpack
+
+        local cloneTool = Instance.new("HopperBin")
+        cloneTool.Name = randomString()
+        cloneTool.BinType = 3
+        cloneTool.Parent = LocalPlayer.Backpack
+
+        local grabTool = Instance.new("HopperBin")
+        grabTool.Name = randomString()
+        grabTool.BinType = 2
+        grabTool.Parent = LocalPlayer.Backpack
+    end,
+})
+
+TabTools:CreateButton({
+    Name = "Load Infinite Yield",
+    Callback = function()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 16,
+    Callback = function(Value)
+        savedWalkSpeed = Value
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = Value
+        end
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 300},
+    Increment = 1,
+    Suffix = " JP",
+    CurrentValue = 50,
+    Callback = function(Value)
+        savedJumpPower = Value
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").JumpPower = Value
+        end
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        infiniteJumpEnabled = Value
+    end,
+})
+
+TabTools:CreateToggle({
+    Name = "Sprint (Hold Key)",
+    CurrentValue = false,
+    Flag = "SprintToggle",
+    Callback = function(Value)
+        sprintEnabled = Value
+        if not Value and holdingSprint then
+            holdingSprint = false
+            if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+                LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+            end
+        end
+    end,
+})
+
+TabTools:CreateKeybind({
+    Name = "Sprint Key",
+    CurrentKeybind = "LeftShift",
+    HoldToInteract = false,
+    Flag = "SprintKey",
+    Callback = function(Key)
+        sprintKey = toKeyCode(Key)
+    end,
+})
+
+TabTools:CreateSlider({
+    Name = "Sprint Speed",
+    Range = {20, 200},
+    Increment = 1,
+    Suffix = " WS",
+    CurrentValue = 50,
+    Callback = function(Value)
+        sprintSpeed = Value
+    end,
+})
+
+--// Input Handling
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if not sprintEnabled then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = true
+        if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = sprintSpeed
+        end
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input, gpe)
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    if input.KeyCode == sprintKey then
+        holdingSprint = false
+        if LocalPlayer and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+            LocalPlayer.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = savedWalkSpeed
+        end
+    end
+end)
+
+-- Listener Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if infiniteJumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+    end
+end)
+
+--// Lógica Unificada de CharacterAdded (Corrige duplicações)
+LocalPlayer.CharacterAdded:Connect(function(char)
+    local humanoid = char:WaitForChild("Humanoid")
+    
+    -- Aplica status salvos
+    humanoid.WalkSpeed = savedWalkSpeed
+    humanoid.JumpPower = savedJumpPower
+    
+    -- Verifica sprint
+    if sprintEnabled and holdingSprint then
+        humanoid.WalkSpeed = sprintSpeed
+    end
+end)
+
+-- Aplica valores iniciais se o personagem já existir
+if LocalPlayer.Character then
+    local humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.WalkSpeed = savedWalkSpeed
+        humanoid.JumpPower = savedJumpPower
+    end
+end
